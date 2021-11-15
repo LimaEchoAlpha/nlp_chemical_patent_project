@@ -131,4 +131,3 @@ dmypy.json
 # raw data folder
 .DS_Store
 raw_data/
-data/
