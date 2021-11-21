@@ -1,6 +1,7 @@
 
 import numpy as np
 import tensorflow as tf
+import bert
 from transformers import BertTokenizer, TFBertModel
 
 def sre_cls_model(bert_model, max_length, train_layers=0):
@@ -23,7 +24,8 @@ def sre_cls_model(bert_model, max_length, train_layers=0):
     in_mask = tf.keras.layers.Input(shape=(max_length,), dtype='int32', name='input_masks')
     in_segment = tf.keras.layers.Input(shape=(max_length,), dtype='int32', name='segment_ids')
     
-    bert_inputs = [in_id, in_mask, in_segment]
+    inputs = [in_id, in_mask, in_segment]
+    bert_inputs = [inputs[0], inputs[2]]
     bert_layer = bert_model
     
     # optional: freeze layers, i.e. only train number of layers specified, starting from the top
@@ -37,17 +39,18 @@ def sre_cls_model(bert_model, max_length, train_layers=0):
                 w._trainable = False
     # end of freezing section
     
-    # BERT layer returns two values: sequence output (0) and pooled output (1)
-    bert_output = bert_layer(bert_inputs)[1]
+    # pick out representation for [CLS] token
+    bert_output = bert_layer(bert_inputs)
+    cls = bert_output[:, 0, :]
     
     # post transformer layers (3): 
     # dense with linear activation, drop out, and prediction    
-    dense = tf.keras.layers.Dense(256, activation='relu', name='dense')(bert_output)
+    dense = tf.keras.layers.Dense(256, activation='relu', name='dense')(cls)
     dense = tf.keras.layers.Dropout(rate=0.1)(dense)
     predictions = tf.keras.layers.Dense(2, activation='softmax', name='sre')(dense)
     
     # build model
-    model = tf.keras.Model(inputs=bert_inputs, outputs=predictions, name='sre_pool')
+    model = tf.keras.Model(inputs=inputs, outputs=predictions, name='sre_cls')
     
     optimizer = tf.keras.optimizers.Adam(learning_rate=3e-5)
     loss_fn = tf.keras.losses.BinaryCrossentropy()
@@ -57,7 +60,7 @@ def sre_cls_model(bert_model, max_length, train_layers=0):
     precision = tf.keras.metrics.Precision()
     
     model.compile(loss="binary_crossentropy", optimizer=optimizer,
-                  metrics=[accuracy, binary_accuracy, recall, precision])
+                  metrics=[binary_accuracy, recall, precision])
     
     print()
     print("=== SRE [CLS] Model ===")
@@ -96,7 +99,7 @@ def sre_start_model(bert_model, max_length, train_layers=0):
     e2_mask = tf.keras.layers.Input(shape=(max_length,), dtype=tf.bool, name='e2_mask')
     
     inputs = [in_id, in_mask, in_segment, e1_mask, e2_mask]
-    bert_inputs = inputs[:3]
+    bert_inputs = [inputs[0], inputs[2]]
     bert_layer = bert_model
     
     # optional: freeze layers, i.e. only train number of layers specified, starting from the top
@@ -110,8 +113,7 @@ def sre_start_model(bert_model, max_length, train_layers=0):
                 w._trainable = False
     # end of freezing section
     
-    # BERT layer returns two values: sequence output (0) and pooled output (1)
-    bert_output = bert_layer(bert_inputs)[0]
+    bert_output = bert_layer(bert_inputs)
     
     # apply masks to pick out start entity tokens
     e1_start = tf.ragged.boolean_mask(bert_output, e1_mask, name='e1_mention')
@@ -129,7 +131,7 @@ def sre_start_model(bert_model, max_length, train_layers=0):
     predictions = tf.keras.layers.Dense(2, activation='softmax', name='sre')(dense)
     
     # build model
-    model = tf.keras.Model(inputs=inputs, outputs=predictions, name='sre_pool')
+    model = tf.keras.Model(inputs=inputs, outputs=predictions, name='sre_start')
     
     optimizer = tf.keras.optimizers.Adam(learning_rate=3e-5)
     loss_fn = tf.keras.losses.BinaryCrossentropy()
@@ -178,7 +180,7 @@ def sre_pool_model(bert_model, max_length, train_layers=0):
     e2_mask = tf.keras.layers.Input(shape=(max_length,), dtype=tf.bool, name='e2_mask')
     
     inputs = [in_id, in_mask, in_segment, e1_mask, e2_mask]
-    bert_inputs = inputs[:3]
+    bert_inputs = [inputs[0], inputs[2]]
     bert_layer = bert_model
     
     # optional: freeze layers, i.e. only train number of layers specified, starting from the top
@@ -191,9 +193,8 @@ def sre_pool_model(bert_model, max_length, train_layers=0):
             if not any([x in w.name for x in retrain_layers]):
                 w._trainable = False
     # end of freezing section
-    
-    # BERT layer returns two values: sequence output (0) and pooled output (1)
-    bert_output = bert_layer(bert_inputs)[0]
+
+    bert_output = bert_layer(bert_inputs)
     
     # apply masks to pick out outputs for mention tokens    
     e1_mention = tf.ragged.boolean_mask(bert_output, e1_mask, name='e1_mention')

@@ -119,7 +119,7 @@ def generate_entity_inputs(full_path, tokenizer, marker_type, head_type, max_len
     all_lists = [bert_inputs, bert_labels, extras]
     bert_inputs: array of arrays for input into BERT model
                  includes tokenIDs, bert masks, sequence IDs, and entity masks
-    bert_labels: tf one hot encoded output labels
+    bert_labels: array of labels (need to be one hot encoded before use in model)
     extras: list of lists with extra information 
             includes original labels, snippet lengths, and discarded entries    
     """
@@ -263,7 +263,7 @@ def generate_standard_inputs(full_path, tokenizer, max_length=500):
     all_lists = [bert_inputs, bert_labels, extras]
     bert_inputs: list of numpy arrays for inputs into BERT model
                  includes tokenIDs, bert masks, sequence IDs, and entity masks
-    bert_labels: one hot encoded output labels
+    bert_labels: array of labels (need to be one hot encoded before use in model)
     extras: list of lists with extra information 
             includes original labels, snippet lengths, and discarded entries    
     """
