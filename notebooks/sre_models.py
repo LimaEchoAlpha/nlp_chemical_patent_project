@@ -54,13 +54,12 @@ def sre_cls_model(bert_model, max_length, train_layers=0):
     
     optimizer = tf.keras.optimizers.Adam(learning_rate=3e-5)
     loss_fn = tf.keras.losses.CategoricalCrossentropy()
-    accuracy = tf.keras.metrics.Accuracy()
-    categorical_accuracy = tf.keras.metrics.CategoricalAccuracy()
+    accuracy = tf.keras.metrics.CategoricalAccuracy()
     recall = tf.keras.metrics.Recall()
     precision = tf.keras.metrics.Precision()
     
     model.compile(loss=loss_fn, optimizer=optimizer,
-                  metrics=[accuracy, categorical_accuracy, recall, precision])
+                  metrics=[accuracy, recall, precision])
     
     print()
     print("=== SRE [CLS] Model ===")
@@ -135,13 +134,12 @@ def sre_start_model(bert_model, max_length, train_layers=0):
     
     optimizer = tf.keras.optimizers.Adam(learning_rate=3e-5)
     loss_fn = tf.keras.losses.CategoricalCrossentropy()
-    accuracy = tf.keras.metrics.Accuracy()
-    categorical_accuracy = tf.keras.metrics.CategoricalAccuracy()
+    accuracy = tf.keras.metrics.CategoricalAccuracy()
     recall = tf.keras.metrics.Recall()
     precision = tf.keras.metrics.Precision()
     
     model.compile(loss=loss_fn, optimizer=optimizer,
-                  metrics=[accuracy, categorical_accuracy, recall, precision])
+                  metrics=[accuracy, recall, precision])
     
     print()
     print("=== SRE Start Entity Model ===")
@@ -220,13 +218,12 @@ def sre_pool_model(bert_model, max_length, train_layers=0):
     
     optimizer = tf.keras.optimizers.Adam(learning_rate=3e-5)
     loss_fn = tf.keras.losses.CategoricalCrossentropy()
-    accuracy = tf.keras.metrics.Accuracy()
-    categorical_accuracy = tf.keras.metrics.CategoricalAccuracy()
+    accuracy = tf.keras.metrics.CategoricalAccuracy()
     recall = tf.keras.metrics.Recall()
     precision = tf.keras.metrics.Precision()
     
     model.compile(loss=loss_fn, optimizer=optimizer,
-                  metrics=[accuracy, categorical_accuracy, recall, precision])
+                  metrics=[accuracy, recall, precision])
     
     print()
     print("=== SRE Max Pool Model ===")
