@@ -206,14 +206,16 @@ def generate_entity_inputs(full_path, tokenizer, marker_type, head_type, max_len
         # generate entity masks
         if head_type == 'start':
             e1_mask, e2_mask = generate_entity_start_mask(snippetTokens, max_length, start1, start2)
+            entity1Masks.append(e1_mask)
+            entity2Masks.append(e2_mask)
             
-            if sum(e1_mask) != 1 or sum(e2_mask) != 1:
-                snippetLengthList.pop()
-                discardedEntries.append(f'{snippet_id}-mask')
-                continue
-            else:
-                entity1Masks.append(e1_mask)
-                entity2Masks.append(e2_mask)
+#             if sum(e1_mask) != 1 or sum(e2_mask) != 1:
+#                 snippetLengthList.pop()
+#                 discardedEntries.append(f'{snippet_id}-mask')
+#                 continue
+#             else:
+#                 entity1Masks.append(e1_mask)
+#                 entity2Masks.append(e2_mask)
         
         elif head_type == 'pool':
             e1_mask, e2_mask = generate_entity_mention_mask(snippetTokens, max_length, start1, start2)
