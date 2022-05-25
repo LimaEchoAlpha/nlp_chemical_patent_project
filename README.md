@@ -7,3 +7,7 @@
 Abstract
 
 Novel chemistries developed outside of academia are often only published in patents, but patents are written for the purpose of protecting intellectual property, so they can be challenging to parse for relevant information.  This project focuses on the relation extraction subtask of extracting the synthesis process of new chemical compounds from patent snippets.  It explores different combinations of input and output representations for BERT models in order to understand which architectures are most effective for classifying relations from chemical patents.  
+
+| ![bert configurations](bert_configs.png) |
+|:--:|
+| <b>Diagram of input and output configurations tested in matrix experiment</b>|
